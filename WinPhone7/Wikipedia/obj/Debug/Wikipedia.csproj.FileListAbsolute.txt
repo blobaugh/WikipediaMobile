@@ -12,3 +12,17 @@ c:\users\a-beloba\documents\visual studio 2010\Projects\Wikipedia\Wikipedia\obj\
 c:\users\a-beloba\documents\visual studio 2010\Projects\Wikipedia\Wikipedia\obj\Debug\Wikipedia.dll
 c:\users\a-beloba\documents\visual studio 2010\Projects\Wikipedia\Wikipedia\obj\Debug\Wikipedia.pdb
 c:\users\a-beloba\documents\visual studio 2010\Projects\Wikipedia\Wikipedia\obj\Debug\XapCacheFile.xml
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\ApplicationIcon.png
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\Background.png
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\Wikipedia.dll
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\Wikipedia.pdb
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\AppManifest.xaml
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\Wikipedia.xap
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\WP7GapClassLib.dll
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\obj\Debug\App.g.i.cs
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\obj\Debug\MainPage.g.i.cs
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\obj\Debug\Wikipedia.g.resources
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\obj\Debug\Wikipedia.dll
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\obj\Debug\Wikipedia.pdb
+C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\obj\Debug\XapCacheFile.xml

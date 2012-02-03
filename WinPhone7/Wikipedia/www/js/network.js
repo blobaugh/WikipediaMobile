@@ -4,10 +4,12 @@ window.network = function () {
     function makeRequest(options) {
         //"http://toolserver.org/~brion/mobile-proxy/?url=" + options.url + "&callback=?"
         //"http://twitter.com/status/user_timeline/benlobaugh.json?count=10&callback=?"
+        //"http://toolserver.org/~brion/mobile-proxy/?url=" + "http://en.m.wikipedia.org" + "&callback=?",
+        jQuery.support.cors = true;
         currentXhr = $.ajax({
-            url: "http://toolserver.org/~brion/mobile-proxy/?url=" + "http://en.m.wikipedia.org" + "&callback=?",
+            url: "https://en.m.wikipedia.org",
             type: 'GET',
-            dataType: "json",
+            dataType: "HTML",
             success: function (data, xhr) {
                 console.log("makeRequest success");
                 if (data == '') {
@@ -26,12 +28,6 @@ window.network = function () {
         });
 
         //http://forum.jquery.com/topic/cross-domain-ajax-and-ie
-
-
-       
-
-
-
     }
 
     function stopCurrentRequest() {
