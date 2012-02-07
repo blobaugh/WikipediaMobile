@@ -51,10 +51,10 @@ window.chrome = function () {
 			$target = $('#main'),
 			$div = $('<div>').html(trimmed);
 
-        $target
-			.empty()
-			.attr('lang', lang)
-			.attr('dir', dir);
+        $target.empty();
+        $target.attr('lang', lang);
+        $target.attr('dir', dir);
+
         $.each(selectors, function (i, sel) {
             $div.find(sel).remove().appendTo($target);
         });
@@ -267,7 +267,7 @@ window.chrome = function () {
         window.scroll(0, 0);
         appHistory.addCurrentPage();
         toggleForward();
-      //  updateMenuState(menu_handlers);
+        //  updateMenuState(menu_handlers);
         $('#search').removeClass('inProgress');
         chrome.hideSpinner();
         console.log('currentHistoryIndex ' + currentHistoryIndex + ' history length ' + pageHistory.length);

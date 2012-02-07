@@ -7,7 +7,7 @@ window.network = function () {
         //"http://toolserver.org/~brion/mobile-proxy/?url=" + "http://en.m.wikipedia.org" + "&callback=?",
         jQuery.support.cors = true;
         currentXhr = $.ajax({
-            url: "https://en.m.wikipedia.org",
+            url: options.url,
             type: 'GET',
             dataType: "HTML",
             success: function (data, xhr) {
@@ -26,8 +26,6 @@ window.network = function () {
                 currentXhr = null;
             }
         });
-
-        //http://forum.jquery.com/topic/cross-domain-ajax-and-ie
     }
 
     function stopCurrentRequest() {
