@@ -3,7 +3,17 @@ var currentHistoryIndex = -1;
 var pageHistory = [];
 
 function init() {
-    document.addEventListener("deviceready", function () { chrome.initialize(); }, true);
+    jQuery.support.cors = true;
+    document.addEventListener("deviceready", onDeviceReady, true);
+}
+
+function onDeviceReady() {
+    document.addEventListener("backbutton", onBackKeyDown, false);
+    chrome.initialize();
+}
+
+function onBackKeyDown() {
+    chrome.goBack();
 }
 
 function homePage() {

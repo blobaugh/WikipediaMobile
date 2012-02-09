@@ -5,7 +5,6 @@ window.network = function () {
         //"http://toolserver.org/~brion/mobile-proxy/?url=" + options.url + "&callback=?"
         //"http://twitter.com/status/user_timeline/benlobaugh.json?count=10&callback=?"
         //"http://toolserver.org/~brion/mobile-proxy/?url=" + "http://en.m.wikipedia.org" + "&callback=?",
-        jQuery.support.cors = true;
         currentXhr = $.ajax({
             url: options.url,
             type: 'GET',

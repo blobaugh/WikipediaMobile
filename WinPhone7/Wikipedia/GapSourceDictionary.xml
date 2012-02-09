@@ -6,11 +6,11 @@
     <FilePath Value="www\error.html"/>
     <FilePath Value="www\index.html"/>
     <FilePath Value="www\wiki.css"/>
-    <FilePath Value="www\images\globe-bg.jpg"/>
-    <FilePath Value="www\images\logo.png"/>
-    <FilePath Value="www\images\spinner.gif"/>
-    <FilePath Value="www\images\spr.png"/>
-    <FilePath Value="www\images\wmf.png"/>
+    <FilePath Value="www\image\globe-bg.jpg"/>
+    <FilePath Value="www\image\logo.png"/>
+    <FilePath Value="www\image\spinner.gif"/>
+    <FilePath Value="www\image\spr.png"/>
+    <FilePath Value="www\image\wmf.png"/>
     <FilePath Value="www\js\app.js"/>
     <FilePath Value="www\js\app_history.js"/>
     <FilePath Value="www\js\chrome.js"/>

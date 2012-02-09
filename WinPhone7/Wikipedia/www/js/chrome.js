@@ -176,7 +176,7 @@ window.chrome = function () {
             //window.history.go(-1);
             if (currentHistoryIndex < 0) {
                 console.log("no more history to browse exiting...");
-                navigator.app.exitApp();
+                navigator.app.exitApp();                
             } else {
                 console.log('going back to item ' + currentHistoryIndex + ': ' + pageHistory[currentHistoryIndex]);
                 app.navigateToPage(pageHistory[currentHistoryIndex], {

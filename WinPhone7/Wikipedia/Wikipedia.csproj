@@ -83,6 +83,11 @@
     <Content Include="www\404.html" />
     <Content Include="www\app.css" />
     <Content Include="www\error.html" />
+    <Content Include="www\image\globe-bg.jpg" />
+    <Content Include="www\image\logo.png" />
+    <EmbeddedResource Include="www\image\spinner.gif" />
+    <Content Include="www\image\spr.png" />
+    <Content Include="www\image\wmf.png" />
     <Content Include="www\index.html" />
     <Content Include="www\js\app.js" />
     <Content Include="www\js\app_history.js" />
@@ -231,11 +236,6 @@
     <Content Include="www\leaflet\images\popup-close.png" />
     <Content Include="www\leaflet\images\zoom-in.png" />
     <Content Include="www\leaflet\images\zoom-out.png" />
-    <Content Include="www\images\globe-bg.jpg" />
-    <Content Include="www\images\logo.png" />
-    <Content Include="www\images\spinner.gif" />
-    <Content Include="www\images\spr.png" />
-    <Content Include="www\images\wmf.png" />
     <None Include="ManifestProcessor.js" />
     <None Include="Properties\AppManifest.xml">
       <SubType>Designer</SubType>
