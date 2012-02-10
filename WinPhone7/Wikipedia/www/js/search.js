@@ -1,5 +1,6 @@
 window.search = function () {
     function performSearch(term, isSuggestion) {
+        console.log("performSearch");
         if ($('#search').hasClass('inProgress')) {
             network.stopCurrentRequest();
             $('#search').removeClass('inProgress');

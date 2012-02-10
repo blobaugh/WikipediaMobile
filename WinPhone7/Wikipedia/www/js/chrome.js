@@ -91,7 +91,8 @@ window.chrome = function () {
             $("#searchForm").bind('submit', function () {
                 search.performSearch($("#searchParam").val(), false);
                 return false;
-            }).bind('keypress', function () {
+            });
+            $("#searchForm").bind('keypress', function () {
                 // Needed because .val doesn't seem to update instantly
                 setTimeout(function () { search.performSearch($("#searchParam").val(), true); }, 5);
             });
@@ -176,7 +177,8 @@ window.chrome = function () {
             //window.history.go(-1);
             if (currentHistoryIndex < 0) {
                 console.log("no more history to browse exiting...");
-                navigator.app.exitApp();                
+                //navigator.app.exitApp();
+                PhoneGap.exec(null, null, 'AppUtils', 'exit', null);
             } else {
                 console.log('going back to item ' + currentHistoryIndex + ': ' + pageHistory[currentHistoryIndex]);
                 app.navigateToPage(pageHistory[currentHistoryIndex], {

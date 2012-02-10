@@ -89,10 +89,14 @@ namespace Wikipedia
         // Code to execute on Unhandled Exceptions
         private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
         {
-            if (System.Diagnostics.Debugger.IsAttached)
+
+            if (!(e.ExceptionObject is PhoneGap.Extension.Commands.AppUtils.ApplicationExitException))
             {
-                // An unhandled exception has occurred; break into the debugger
-                System.Diagnostics.Debugger.Break();
+                if (System.Diagnostics.Debugger.IsAttached)
+                {
+                    // An unhandled exception has occurred; break into the debugger
+                    System.Diagnostics.Debugger.Break();
+                }
             }
         }
 

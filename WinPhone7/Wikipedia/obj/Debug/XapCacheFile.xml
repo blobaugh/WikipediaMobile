@@ -1,13 +1,13 @@
-﻿<xapCache source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\Wikipedia.xap" wasSigned="False" certificateThumbprint="" TimeStampUrl="" lastWriteTime="2/8/2012 12:10:30 PM">
+﻿<xapCache source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\Wikipedia.xap" wasSigned="False" certificateThumbprint="" TimeStampUrl="" lastWriteTime="2/10/2012 11:04:12 AM">
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Bin\Debug\WMAppManifest.xml" archivePath="WMAppManifest.xml" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\Background.png" archivePath="Background.png" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\ApplicationIcon.png" archivePath="ApplicationIcon.png" lastWriteTime="2/3/2012 12:19:13 PM" />
-  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\obj\Debug\Wikipedia.dll" archivePath="Wikipedia.dll" lastWriteTime="2/8/2012 11:50:41 AM" />
+  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\obj\Debug\Wikipedia.dll" archivePath="Wikipedia.dll" lastWriteTime="2/9/2012 12:24:42 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\GapLib\WP7GapClassLib.dll" archivePath="WP7GapClassLib.dll" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\GapLib\WP7GapClassLib.dll" archivePath="GapLib\WP7GapClassLib.dll" lastWriteTime="2/3/2012 12:19:13 PM" />
-  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\GapSourceDictionary.xml" archivePath="GapSourceDictionary.xml" lastWriteTime="2/8/2012 12:10:29 PM" />
+  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\GapSourceDictionary.xml" archivePath="GapSourceDictionary.xml" lastWriteTime="2/10/2012 11:04:12 AM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\404.html" archivePath="www\404.html" lastWriteTime="2/3/2012 12:19:13 PM" />
-  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\app.css" archivePath="www\app.css" lastWriteTime="2/8/2012 12:10:29 PM" />
+  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\app.css" archivePath="www\app.css" lastWriteTime="2/8/2012 12:11:20 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\error.html" archivePath="www\error.html" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\image\globe-bg.jpg" archivePath="www\image\globe-bg.jpg" lastWriteTime="2/3/2012 12:40:34 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\image\logo.png" archivePath="www\image\logo.png" lastWriteTime="2/3/2012 12:40:34 PM" />
@@ -16,7 +16,7 @@
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\index.html" archivePath="www\index.html" lastWriteTime="2/8/2012 11:52:37 AM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\app.js" archivePath="www\js\app.js" lastWriteTime="2/7/2012 1:29:41 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\app_history.js" archivePath="www\js\app_history.js" lastWriteTime="2/3/2012 12:19:13 PM" />
-  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\chrome.js" archivePath="www\js\chrome.js" lastWriteTime="2/8/2012 10:45:50 AM" />
+  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\chrome.js" archivePath="www\js\chrome.js" lastWriteTime="2/10/2012 10:04:59 AM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\geo.js" archivePath="www\js\geo.js" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\hogan.min.js" archivePath="www\js\hogan.min.js" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\iscroll.js" archivePath="www\js\iscroll.js" lastWriteTime="2/3/2012 12:19:13 PM" />
@@ -37,14 +37,14 @@
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\lawnchair\plugins\callbacks.js" archivePath="www\js\lawnchair\plugins\callbacks.js" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\lawnchair\plugins\pagination.js" archivePath="www\js\lawnchair\plugins\pagination.js" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\lawnchair\plugins\query.js" archivePath="www\js\lawnchair\plugins\query.js" lastWriteTime="2/3/2012 12:19:13 PM" />
-  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\main.js" archivePath="www\js\main.js" lastWriteTime="2/8/2012 12:07:04 PM" />
+  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\main.js" archivePath="www\js\main.js" lastWriteTime="2/10/2012 10:11:09 AM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\mediawiki.js" archivePath="www\js\mediawiki.js" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\network.js" archivePath="www\js\network.js" lastWriteTime="2/8/2012 11:50:40 AM" />
-  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\platform-stub.js" archivePath="www\js\platform-stub.js" lastWriteTime="2/3/2012 11:39:57 AM" />
+  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\platform-stub.js" archivePath="www\js\platform-stub.js" lastWriteTime="2/10/2012 9:49:26 AM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\preferences.js" archivePath="www\js\preferences.js" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\propertiesFileReader.js" archivePath="www\js\propertiesFileReader.js" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\savedpages.js" archivePath="www\js\savedpages.js" lastWriteTime="2/3/2012 12:19:13 PM" />
-  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\search.js" archivePath="www\js\search.js" lastWriteTime="2/7/2012 1:50:45 PM" />
+  <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\search.js" archivePath="www\js\search.js" lastWriteTime="2/9/2012 12:57:34 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\settings.js" archivePath="www\js\settings.js" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\templates.js" archivePath="www\js\templates.js" lastWriteTime="2/3/2012 12:19:13 PM" />
   <file source="C:\Users\a-cobroo\Documents\github\WikipediaMobile\WinPhone7\Wikipedia\www\js\toggle.js" archivePath="www\js\toggle.js" lastWriteTime="2/3/2012 12:19:13 PM" />

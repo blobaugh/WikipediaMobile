@@ -17,6 +17,8 @@ if (ua.match(/; Android /)) {
 } else if (ua.match(/Windows Phone/)) {
 	//  Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0; Microsoft; XDeviceEmulator)
 	platform = 'winphone';
+} else {
+    platform = 'winphone';
 }
 
 if (platform == 'unknown') {
