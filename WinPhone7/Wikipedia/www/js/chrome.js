@@ -89,12 +89,12 @@ window.chrome = function () {
                 return false;
             });
             $("#searchForm").bind('submit', function () {
-                search.performSearch($("#searchParam").val(), false);
-                return false;
+                searchobj.performSearch($("#searchParam").val(), false);
+                return false; 
             });
             $("#searchForm").bind('keypress', function () {
                 // Needed because .val doesn't seem to update instantly
-                setTimeout(function () { search.performSearch($("#searchParam").val(), true); }, 5);
+                setTimeout(function () { searchobj.performSearch($("#searchParam").val(), true); }, 5);
             });
             $("#clearSearch").bind('touchstart', function () {
                 clearSearch();

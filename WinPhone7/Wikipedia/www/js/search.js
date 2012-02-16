@@ -1,4 +1,4 @@
-window.search = function () {
+window.searchobj = function () {
     function performSearch(term, isSuggestion) {
         console.log("performSearch");
         if ($('#search').hasClass('inProgress')) {
@@ -52,8 +52,8 @@ window.search = function () {
     }
 
     function renderResults(results) {
-
-        results = JSON.parse(results);
+        results = JSON.parse(JSON.stringify(results));
+        console.log(JSON.stringify(results));
         var template = templates.getTemplate('search-results-template');
         if (results.length > 0) {
             var searchParam = results[0];
@@ -72,11 +72,12 @@ window.search = function () {
             $("#resultList .listItemContainer").each(function () {
                 var container = this;
                 var url = $(this).attr('data-page-url');
-                savedPagesDB.exists(url, function (exists) {
-                    if (exists) {
+                /*savedPagesDB.exists(url, function (exists) {
+                    if (exists) {                    
                         $(container).find(".iconSearchResult").removeClass("iconSearchResult").addClass("iconSavedPage");
                     }
                 });
+                */
             });
         });
 
