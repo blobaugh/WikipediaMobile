@@ -89,7 +89,7 @@ window.searchobj = function () {
             $("#content").hide(); // Not chrome.hideContent() since we want the header
         }
 
-        chrome.doFocusHack();
+   //     chrome.doFocusHack();
         $('#searchresults').show();
         chrome.doScrollHack('#searchresults .scroller');
     }
