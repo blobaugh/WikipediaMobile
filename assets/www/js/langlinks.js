@@ -2,63 +2,47 @@ window.languageLinks = function() {
 	var langs = [];
 	function onLanguageLinkClick() {
 		var parent = $(this).parents(".listItemContainer");
-		var url = parent.attr("data-page-url");
-		app.navigateToPage(url);
-	}
-
-	/**
-	 * Helper function for converting protocol relative urls to https
-	 */
-	function processLanguageUrl(url) {
-		if (url.substr(0, 2) == '//') {
-			url = 'https:' + url;
-		}
-		return url;
-	}
-
-	/**
-	 * Function called with div of current page
-	 * Saves languages that page is available in for use in Read-in
-	 */
-	function parseAvailableLanguages(body) {
-		langs = [];
-		body.find('#languageselection option').each(function(i, option) {
-			var $option = $(this);
-			langs.push({
-				name: $option.text(),
-				url: processLanguageUrl($option.val()),
-				selected: ($option.attr('selected') != null)
-			});
-		});
-	}
-
-	/**
-	 * Clears languages available. Also blanks out the 'Read in' menu item
-	 */
-	function clearLanguages() {
-		langs = [];
-	}
-
-	/**
-	 * Format the language list in the same style as saved pages & history,
-	 * pulling link data from the iframe.
-	 */
-	function showAvailableLanguages() {
-		var template = templates.getTemplate("language-links-template");
-		$("#langList").html(template.render({languages: langs}));
-		$(".languageLink").click(onLanguageLinkClick);
-		chrome.hideOverlays();
+		var title = parent.data("title");
+		var lang = parent.data("lang");
 		chrome.hideContent();
+		chrome.showSpinner();
+		app.navigateTo(title, lang);
+	}
 
-		$('#langlinks').localize().show();
-		
-		chrome.doFocusHack();
-		chrome.doScrollHack('#langlinks .scroller');
+	function showLangLinks(page) {
+		chrome.showSpinner();
+		var req = page.requestLangLinks().done(function(langLinks) {
+			var template = templates.getTemplate("language-links-template");
+			app.getWikiMetadata().done(function(wikis) {
+				$.each(langLinks, function(i, link) {
+					link.dir = l10n.isLangRTL(link.lang) ? "rtl" : "ltr";
+					link.langName = wikis[link.lang].name;
+				});
+				langLinks.sort(function(l1, l2) {
+					return l1.langName.localeCompare(l2.langName);
+				});
+				$("#langList").html(template.render({langLinks: langLinks}));
+				$(".languageLink").click(onLanguageLinkClick);
+				chrome.hideOverlays();
+				chrome.hideContent();
+				chrome.hideSpinner();
+				$('#langlinks').localize().show();
+
+				chrome.setupScrolling('#langlinks .scroller');
+			});
+		}).fail(function(err, textStatus) {
+			if(textStatus === "abort") {
+				// User cancelled action. Do nothing!
+				console.log("User cancelled langlinks view");
+				return;
+			}
+			chrome.hideSpinner();
+			chrome.popupErrorMessage(xhr);
+		});
+		chrome.setSpinningReq(req);
 	}
 
 	return {
-		showAvailableLanguages: showAvailableLanguages,
-		parseAvailableLanguages: parseAvailableLanguages,
-		clearLanguages: clearLanguages
+		showLangLinks: showLangLinks
 	};
 }();

@@ -21,6 +21,17 @@ var SimpleMenu = function()
   });
 }
 
+SimpleMenu.prototype.setMenuState = function(action, state, win, fail) {
+	PhoneGap.exec(function(result) {
+		win(result);
+	},
+	function(ex)
+	{
+		fail(ex);
+	},
+	"SimpleMenu", "setMenuState", [action, state]);
+}
+
 SimpleMenu.prototype.loadMenu = function(menu, triggers, win, fail)
 {
   this.menu = [];
@@ -32,7 +43,12 @@ SimpleMenu.prototype.loadMenu = function(menu, triggers, win, fail)
     item.icon = commands[i].getAttribute('icon');
     item.action = commands[i].getAttribute('action');
     item.label = commands[i].getAttribute('label');
-    item.disabled = commands[i].getAttribute('disabled');
+    var disabled = commands[i].getAttribute('disabled');
+    if(disabled == 'disabled')
+    	disabled = true;
+    if(disabled == 'null')
+    	disabled = false;    
+    item.disabled = disabled;
     this.menu.push(item);
   }
   var setRefresh = this.setRefresh;
@@ -82,8 +98,6 @@ SimpleMenu.prototype.fireCallback = function(index)
   }
 }
 
-PhoneGap.addConstructor(function() 
-{
-  PhoneGap.addPlugin("SimpleMenu", new SimpleMenu());
+cordova.addConstructor(function() {
+	window.SimpleMenu = new SimpleMenu();
 });
-

@@ -1,5 +1,7 @@
 window.geo = function() {
-	
+
+	var shownURLs = [];
+
 	function showNearbyArticles( args ) {
 		var args = $.extend(
 			{
@@ -9,70 +11,96 @@ window.geo = function() {
 			},
 			args
 		);
-		
+
 		chrome.hideOverlays();
 		chrome.hideContent();
 		$("#nearby-overlay").localize().show();
-		chrome.doFocusHack();
-		
-		var geomap = new L.Map('map');
-		var tiles = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			maxZoom: 18,
-			attribution: 'Map data &copy; 2011 OpenStreetMap contributors'
-		});
-		geomap.addLayer(tiles);
+
+		if (!geo.map) {
+			// Disable webkit 3d CSS transformations for tile positioning
+			// Causes lots of flicker in PhoneGap for some reason...
+			L.Browser.webkit3d = false;
+			options = {};
+			if (navigator.userAgent.match(/Android 2/)) {
+				// Android 2.x
+				// @todo enable the pinch-zoom plugin
+			} else {
+				options.touchZoom = true;
+				options.zoomControl = false;
+			}
+			geo.map = new L.Map('map', options);
+			//var tiles = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			var tiles = new L.TileLayer('http://otile{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png', {
+				maxZoom: 18,
+				subdomains: '1234' // for MapQuest tiles
+			});
+			geo.map.addLayer(tiles);
+
+			geo.map.attributionControl.setPrefix("");
+			geo.map.attributionControl.addAttribution('<span class="map-attribution">' + mw.message("attribution-mapquest") + '</span>');
+			geo.map.attributionControl.addAttribution("<br /><span class='map-attribution'>" + mw.message("attribution-osm") + '</span>');
+
+			$(".map-attribution a").bind('click', function(event) {
+				// Force web links to open in external browser
+				// instead of the app, where navigation will be broken.
+				chrome.openExternalLink(this.href);
+				event.preventDefault();
+			});
+		}
 
 		// @fixme load last-seen coordinates
-		geomap.setView(new L.LatLng(args.lat, args.lon), 13);
-		
+		geo.map.setView(new L.LatLng(args.lat, args.lon), 18);
+
 		var findAndDisplayNearby = function( lat, lon ) {
 			geoLookup( lat, lon, preferencesDB.get("language"), function( data ) {
-				geoAddMarkers( data, geomap );
+				geoAddMarkers( data );
 			}, function(err) {
-				alert(err);
+				chrome.popupErrorMessage("error");
+				chrome.showContent();
+				console.log(JSON.stringify(err));
 			});
 		};
-		
+
 		var ping = function() {
-			var pos = geomap.getCenter();
+			var pos = geo.map.getCenter();
 			findAndDisplayNearby( pos.lat, pos.lng );
 		};
-		
+
 		if ( args.current ) {
-			geomap.on('viewreset', ping);
-			geomap.on('locationfound', ping);
-			geomap.on('moveend', ping);
-			geomap.locateAndSetView(13);
+			geo.map.on('viewreset', ping);
+			geo.map.on('locationfound', ping);
+			geo.map.on('moveend', ping);
+			geo.map.locate({
+				setView: true,
+				maxZoom: 18,
+				enableHighAccuracy: true
+			});
 		}
 		else {
 			findAndDisplayNearby( args.lat, args.lon );
 		}
 	}
-	
+
 	function getFloatFromDMS( dms ) {
-		console.log('dms: '+ dms);
-		dms = dms.trim().toLowerCase();
-		dms = dms.replace( '′', "'" ).replace( '″', '"' );
-		
 		var multiplier = /[sw]/i.test( dms ) ? -1 : 1;
 		var bits = dms.match(/[\d.]+/g);
 
-		var float = 0;
-		
+		var coord = 0;
+
 		for ( var i = 0, iLen=bits.length; i<iLen; i++ ) {
-			float += bits[i] / multiplier;
+			coord += bits[i] / multiplier;
 			multiplier *= 60;
 		}
-		console.log('float: '+ float);
-		return float;
+
+		return coord;
 	}
-	
+
 	function addShowNearbyLinks() {
-		$( 'span.geo-dms' ).each( function() { 
+		$( 'span.geo-dms' ).each( function() {
 			var $coords = $( this ),
 			lat = $coords.find( 'span.latitude' ).text(),
 			lon = $coords.find( 'span.longitude' ).text();
-			
+
 			$coords.closest( 'a' ).attr( 'href', '#' ).click( function() {
 				showNearbyArticles( {
 					'lat': getFloatFromDMS( lat ),
@@ -82,7 +110,7 @@ window.geo = function() {
 			} );
 		} );
 	}
-	
+
 	function geoLookup(latitude, longitude, lang, success, error) {
 		var requestUrl = "http://ws.geonames.net/findNearbyWikipediaJSON?formatted=true&";
 		requestUrl += "lat=" + latitude + "&";
@@ -92,29 +120,40 @@ window.geo = function() {
 		$.ajax({
 			url: requestUrl,
 			success: function(data) {
-				success(JSON.parse(data));
+				success(data);
 			},
 			error: error
 		});
 	}
-	
-	function geoAddMarkers( data, geomap ) {
-		var geomarkers = new L.LayerGroup();
+
+	function geoAddMarkers( data ) {
 		$.each(data.geonames, function(i, item) {
-			var url = item.wikipediaUrl.replace(/^([a-z0-9-]+)\.wikipedia\.org/, 'https://$1.m.wikipedia.org');
-			var marker = new L.Marker(new L.LatLng(item.lat, item.lng));
-			geomarkers.addLayer(marker);
-			marker.bindPopup('<div onclick="app.navigateToPage(&quot;' + url + '&quot;);hideOverlays();">' +
-			                 '<strong>' + item.title + '</strong>' +
-			                 '<p>' + item.summary + '</p>' +
-			                 '</div>');
+			var summary, html,
+				url = item.wikipediaUrl.replace(/^([a-z0-9-]+)\.wikipedia\.org/, window.PROTOCOL + '://$1.m.wikipedia.org');
+			if($.inArray(url, shownURLs) === -1) {
+				var marker = new L.Marker(new L.LatLng(item.lat, item.lng));
+				summary = item.summary || '';
+
+				html = "<div><strong>" + item.title + "</strong><p>" + summary + "</p></div>";
+				var $popupContent = $( html ).click( function() {
+					app.navigateToPage( url, { hideCurrent: true } );
+				} );
+				if(l10n.isLangRTL(preferencesDB.get('language'))) {
+					$popupContent.attr( 'dir', 'rtl' );
+				} else {
+					$popupContent.attr( 'dir', 'ltr' );
+				}
+				marker.bindPopup($popupContent[0], {closeButton: false});
+				geo.map.addLayer(marker);
+				shownURLs.push(url);
+			}
 		});
-		geomap.addLayer(geomarkers);
 	}
-	
+
 	return {
 		showNearbyArticles: showNearbyArticles,
-		addShowNearbyLinks: addShowNearbyLinks
+		addShowNearbyLinks: addShowNearbyLinks,
+		map: null
 	};
 
 }();

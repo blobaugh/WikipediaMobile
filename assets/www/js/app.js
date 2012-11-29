@@ -1,144 +1,274 @@
 window.app = function() {
-	function loadCachedPage (url) {
-		// Hide the iframe until the stylesheets are loaded,
-		// to avoid flash of unstyled text.
-		// Instead we're hidden, which also sucks.
-		var replaceRes = function() {
 
-			// images
-			$('#main img').each(function() {
-				var em = $(this);
-				var gotLinkPath = function(linkPath) {
-					em.attr('src', 'file://' + linkPath.file);
-				}
-				var target = this.src.replace('file:', 'https:');
-				window.plugins.urlCache.getCachedPathForURI(target, gotLinkPath, gotError);
+	var wikis = null;
+
+	function getWikiMetadata() {
+		var d = $.Deferred();
+		if( wikis === null ) {
+			$.get(ROOT_URL + 'wikis.json').done(function(data) {
+				wikis = JSON.parse(data);
+				d.resolve(wikis);
 			});
-		};
-		var gotPath = function(cachedPage) {
-			loadPage('file://' + cachedPage.file, url, function() {
-				replaceRes();
-			});
+		} else {
+			d.resolve(wikis);
 		}
-		var gotError = function(error) {
-			console.log('Error: ' + error);
-			chrome.hideSpinner();
-			// chrome.showNoConnectionMessage();
-			// navigator.app.exitApp();
-		}
-		window.plugins.urlCache.getCachedPathForURI(url, gotPath, gotError);
+		return d;
 	}
 
-	function loadPage(url, origUrl, callback) {
-		origUrl = origUrl || url;
-		console.log('hideAndLoad url ' + url);
-		console.log('hideAndLoad origUrl ' + origUrl);
-		app.setCaching(true);
-		network.makeRequest({
-			url: url, 
-			success: function(data) {
-					chrome.renderHtml(data, origUrl);
-					if(callback) {
-						callback();
-					}
-					chrome.onPageLoaded();
-				},
-			error: function(xhr) {
-				if(xhr.status == 404) {
-					loadLocalPage('404.html');
-				} else {
-					loadLocalPage('error.html');
-				}
-				languageLinks.clearLanguages();
-				$('#savePageCmd').attr('disabled', 'true');
-				console.log('disabling language');
-				$('#languageCmd').attr('disabled', 'true');
-			}
+	function loadMainPage(lang) {
+		var d = $.Deferred();
+		if(typeof lang === "undefined") {
+			lang = preferencesDB.get("language");
+		}
+
+		app.getWikiMetadata().done(function(wikis) {
+			var mainPage = wikis[lang].mainPage;
+			app.navigateTo( mainPage, lang, { isCompletePage: true } ).done( function( data ) {
+				d.resolve(data);
+			}).fail(function(err) {
+				d.reject(err);
+			});
 		});
-		app.setCaching(false);
+		return d;
+	}
+
+	function loadCachedPage( url, title, lang ) {
+		// Overriden by platform specific implementations;
+	}
+
+	function setCurrentPage(page) {
+		app.curPage = page;
+		chrome.renderHtml(page);
+
+		setPageActionsState(true);
+		setMenuItemState('read-in', true);
+		chrome.setupScrolling("#content");
+		chrome.scrollTo("#content", 0);
+		appHistory.addCurrentPage();
+		chrome.toggleMoveActions();
+		geo.addShowNearbyLinks();
+		$("#page-footer").show();
+		chrome.showContent();
+		chrome.hideSpinner();
+	}
+
+	function setErrorPage(type) {
+		if(type == 404) {
+			loadLocalPage('404.html');
+		} else {
+			loadLocalPage('error.html');
+		}
+		setMenuItemState('read-in', false);
+		setPageActionsState(false);
+		chrome.hideSpinner();
+		$("#page-footer").hide();
+		app.curPage = null;
+	}
+
+	function loadPage( title, language, isCompletePage ) {
+		var d = $.Deferred();
+
+		function doRequest() {
+			var req = Page.requestFromTitle( title, language, isCompletePage ).done( function( page ) {
+				if(page === null) {
+					setErrorPage(404);
+				}
+				setCurrentPage(page);
+				if( !page.isCompletePage ) {
+					page.requestCompletePage().done( function() {
+						console.log("Full page retreived!");
+					});
+				}
+				d.resolve(page);
+			}).fail(function(xhr, textStatus, errorThrown) {
+				if(textStatus === "abort") {
+					// User cancelled action. Do nothing!
+					console.log("User cancelled action!");
+					return;
+				}
+				setErrorPage(xhr.status);	
+				d.reject(xhr);
+			});
+			chrome.setSpinningReq(req);
+		}
+
+		doRequest();
+		return d;
 	}
 
 	function loadLocalPage(page) {
-		$('base').attr('href', 'file:///android_asset/www/');
+		var d = $.Deferred();
+		$('base').attr('href', ROOT_URL);
 		$('#main').load(page, function() {
 			$('#main').localize();
-			chrome.onPageLoaded();
+			d.resolve();
 		});
+		return d;
 	}
 
-	function urlForTitle(title) {
-		return app.baseURL + "/wiki/" + encodeURIComponent(title.replace(/ /g, '_'));
+	function urlForTitle(title, lang) {
+		if(typeof lang === 'undefined') {
+			lang = preferencesDB.get("language");
+		}
+		return app.baseUrlForLanguage(lang) + "/wiki/" + encodeURIComponent(title.replace(/ /g, '_'));
+	}
+
+	function resourceLoaderURL( lang ) {
+		// Path to the ResourceLoader load.php to be used for loading site-specific css
+		return "http://bits.wikimedia.org/" + lang + ".wikipedia.org/load.php"
+	}
+
+	function baseUrlForLanguage(lang) {
+		return window.PROTOCOL + '://' + lang + '.' + PROJECTNAME + '.org';
+	}
+
+	function makeCanonicalUrl(lang, title) {
+		return baseUrlForLanguage(lang) + '/wiki/' + encodeURIComponent(title.replace(/ /g, '_'));
 	}
 
 	function setContentLanguage(language) {
 		preferencesDB.set('language', language);
-		app.baseURL = 'https://' + language + '.m.wikipedia.org';
+		app.baseURL = app.baseUrlForLanguage(language);
 	}
 
 	function setFontSize(size) {
 		preferencesDB.set('fontSize', size);
 		$('#main').css('font-size', size);
 	}
-	
-	
-	function setCaching() {
-		// do nothing by default
+
+	var curTheme = null;
+	function setTheme( name ) {
+		var url = ROOT_URL + 'themes/' + name + '.less.css';
+		if( name == curTheme ) {
+			return;
+		}
+		$.get( url ).done( function( data ) {
+			chrome.loadCSS( 'theme-style', data );
+			$( 'body' ).removeClass( 'theme-' + curTheme ).addClass( 'theme-' + name );
+			curTheme = name;
+			preferencesDB.set( 'theme', name );
+		} );
 	}
 
+	function navigateTo(title, lang, options) {
+		var d = $.Deferred();
+		var options = $.extend( {cache: false, updateHistory: true, isCompletePage: false}, options || {} );
+		var url = app.urlForTitle(title, lang);
 
-	function navigateToPage(url, options) {
-		var options = $.extend({cache: false, updateHistory: true}, options || {});
-		$('#searchParam').val('');
-		$('#search').addClass('inProgress');
-		chrome.showSpinner();
-		
-		if (options.cache) {
-			loadCachedPage(url);
-		} else {
-			loadPage(url);
+		if(title === "") {
+			return app.loadMainPage(lang);
 		}
+
+		$('#searchParam').val('');
+		chrome.showContent();
+		if(options.hideCurrent) {
+			$("#content").hide();
+		}
+		chrome.showSpinner();
+
 		if (options.updateHistory) {
 			currentHistoryIndex += 1;
 			pageHistory[currentHistoryIndex] = url;
-			// We're adding an entry to the 'forward/backwards' chain.
-			// So disable forward.
-		} 
-		console.log("navigating to " + url);
-		var savedPagesDB = new Lawnchair({name: "savedPagesDB"}, function() {
-			this.exists(url, function(exists) {
-				if(!exists) {
-					$("#savePageCmd").attr("disabled", "false");
-				} else {
-					$("#savePageCmd").attr("disabled", "true");
-				}
-			});
+		}
+		if(title === "") {
+			title = "Main_Page"; // FIXME
+		}
+		d = app.loadPage( title, lang, options.isCompletePage );
+		d.done(function(page) {
+			if(options.hideCurrent) {
+				$("#content").show();
+				// see http://forrst.com/posts/iOS_scrolling_issue_solved-rgX
+				// Fix for bug causing page to not scroll in iOS 5.x when visited from nearby
+				chrome.scrollTo("#content", 0);
+			}			
 		});
-		// Enable change language - might've been disabled in a prior error page
-		console.log('enabling language');
-		$('#languageCmd').attr('disabled', 'false');  
-		chrome.showContent();
+		return d;
+	}
+
+	function navigateToPage(url, options) {
+		var title = app.titleForUrl(url);
+		var lang = app.languageForUrl(url);
+		return app.navigateTo(title, lang, options);
 	}
 
 	function getCurrentUrl() {
-		return pageHistory[currentHistoryIndex];
+		if(app.curPage) {
+			return app.curPage.getCanonicalUrl();
+		} else {
+			return null;
+		}
 	}
 
-	function getCurrentTitle() {
-		var url = getCurrentUrl(),
-			page = url.replace(/^https?:\/\/[^\/]+\/wiki\//, ''),
+	function languageForUrl(url) {
+		// Use the least significant part of the hostname as language
+		// So en.wikipedia.org would be 'en', and so would en.wiktionary.org
+		return url.match(/^https?:\/\/([^.]+)./)[1];	
+	}
+
+	function titleForUrl(url) {
+		var page = url.replace(/^https?:\/\/[^\/]+(\/wiki\/)?/, ''),
 			unescaped = decodeURIComponent(page),
 			title = unescaped.replace(/_/g, ' ');
 		return title;
 	}
+	function getCurrentTitle() {
+		if(app.curPage) {
+			return app.curPage.title;
+		} else {
+			return null;
+		}
+	}
 
+	function makeAPIRequest(params, lang, extraOptions) {
+		params = params || {};
+		params.format = 'json'; // Force JSON
+		lang = lang || preferencesDB.get('language');
+		var url = app.baseUrlForLanguage(lang) + '/w/api.php';
+		var defaultOptions = {
+			url: url,
+			data: params,
+			// Making this 'text' and parsing the JSON ourselves makes things much easier
+			// Than making it as 'JSON' for pre-processing via dataFilter
+			// See https://forum.jquery.com/topic/datafilter-function-and-json-string-result-problems
+			dataType: 'text',
+			dataFilter: function(text) {
+				return JSON.parse(text);
+			}
+		};
+		var options = $.extend(defaultOptions, extraOptions);
+		return $.ajax(options);
+	}
+
+	function track(eventId) {
+		makeAPIRequest({
+			eventid: eventId,
+			namespacenumber: 0,
+			token: '+/', // Anonymous token
+			additional: 'android' // System info
+		}, preferencesDB.get('language'));
+	}
 	var exports = {
 		setFontSize: setFontSize,
+		setTheme: setTheme,
 		setContentLanguage: setContentLanguage,
 		navigateToPage: navigateToPage,
 		getCurrentUrl: getCurrentUrl,
 		getCurrentTitle: getCurrentTitle,
 		urlForTitle: urlForTitle,
-		setCaching: setCaching
+		titleForUrl:titleForUrl,
+		languageForUrl: languageForUrl,
+		baseUrlForLanguage: baseUrlForLanguage,
+		resourceLoaderURL: resourceLoaderURL,
+		loadPage: loadPage,
+		loadCachedPage: loadCachedPage, 
+		makeCanonicalUrl: makeCanonicalUrl,
+		makeAPIRequest: makeAPIRequest,
+		setCurrentPage: setCurrentPage,
+		track: track,
+		curPage: null,
+		navigateTo: navigateTo,
+		getWikiMetadata: getWikiMetadata,
+		loadMainPage: loadMainPage
 	};
 
 	return exports;

@@ -14,21 +14,28 @@ window.preferencesDB = {
 		'locale': function(success) {
 			var defaults = this;
 			l10n.navigatorLang(function(lang) {
-				defaults.locale = l10n.normalizeLanguageCode(lang);
+				defaults.locale = l10n.normalizeLanguageCode(lang || 'en');
 				console.log('done with navigate');
 				success();
 			});
 		},
 		// The language. Only for content
 		'language': function(success) {
-			this.language = preferencesDB.get('locale').replace(/-.*?$/, '');
+			this.language = l10n.normalizeLanguageCode(preferencesDB.get('locale').replace(/-.*?$/, ''));
 			success();
-		}
+		},
+		// UI Language. Only for UI. Not replaced, unlike language
+		'uiLanguage': function(success) {
+			this.uiLanguage = l10n.normalizeLanguageCode(preferencesDB.get('locale').replace(/-.*?$/, ''));
+			success();
+		},
+		'theme': 'light'
 	},
 	// Ordering of default initializer functions to call
 	defaultFunctions: [
 		'locale',
-		'language'
+		'language',
+		'uiLanguage'
 		],
 	// Serializes default function calls
 	initializeDefaults: function(success) {
@@ -56,5 +63,13 @@ window.preferencesDB = {
 	},
 	set: function(pref, value) {
 		localStorage.setItem(pref, value);
+		$.each(this.onSet, function(index, fun) {
+			fun(pref, value);
+		});
+	},
+	onSet: [],
+	//add an event executed when set method is executed. They must take to params, the id of the preference and his value.
+	addOnSet: function(fun) {
+		this.onSet.push(fun);
 	}
 };

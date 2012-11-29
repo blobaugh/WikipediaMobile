@@ -1,46 +1,25 @@
 package org.wikipedia;
 
-import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-//import android.util.Log;
-//import android.webkit.WebView;
 
-import com.phonegap.DroidGap;
+import org.apache.cordova.DroidGap;
 
 public class WikipediaActivity extends DroidGap {
-    /** Called when the activity is first created. */
-	
-	public class WikipediaWebViewClient extends GapViewClient {
-		public WikipediaWebViewClient(DroidGap ctx) {
-			super(ctx);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		super.loadUrl("file:///android_asset/www/index.html");
+
+		String currentUA = this.appView.getSettings().getUserAgentString();
+
+		try {
+			PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+			this.appView.getSettings().setUserAgentString("WikipediaMobile/" + pInfo.versionName + " " + currentUA);
+		} catch (NameNotFoundException e) {
+			// This never actually happens. Trust me, I'm an engineer!
 		}
-		
-		//@Override
-		//public void onLoadResource(WebView view, String url) {
-		//	Log.d("WikipediaWebViewClient", "OnLoadResource "+url);
-		//}
-		
 	}
-	
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
-        // NearBy shit
-		SharedPreferences preferences = getSharedPreferences("nearby", MODE_PRIVATE);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.remove("doSearchNearBy");
-		editor.commit();
-		
-        super.loadUrl("file:///android_asset/www/index.html");
-        this.webViewClient = new WikipediaWebViewClient(this);
-        this.appView.setWebViewClient(this.webViewClient);
-    }
-    
-    @Override
-    public void onReceivedError(final int errorCode, final String description, final String failingUrl) {
-    	// no-op!
-    }
 }

@@ -6,9 +6,9 @@ import org.json.JSONException;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.phonegap.api.Plugin;
-import com.phonegap.api.PluginResult;
-import com.phonegap.api.PluginResult.Status;
+import org.apache.cordova.api.PluginResult;
+import org.apache.cordova.api.Plugin;
+import org.apache.cordova.api.PluginResult.Status;
 
 public class ToastPlugin extends Plugin {
 
@@ -25,11 +25,11 @@ public class ToastPlugin extends Plugin {
 			Log.e(TAG, "Required parameter 'Toast Message' missing");
 			return new PluginResult(Status.ERROR);
 		}
-		
+
 		if (action.equals(LONG_TOAST_ACTION)) {
-		  ctx.runOnUiThread(new RunnableToast(toastMessage, Toast.LENGTH_LONG));
+			ctx.runOnUiThread(new RunnableToast(toastMessage, Toast.LENGTH_LONG));
 		} else {
-		  ctx.runOnUiThread(new RunnableToast(toastMessage, Toast.LENGTH_SHORT));
+			ctx.runOnUiThread(new RunnableToast(toastMessage, Toast.LENGTH_SHORT));
 		}
 
 		return new PluginResult(Status.OK);
@@ -46,7 +46,7 @@ public class ToastPlugin extends Plugin {
 
 		@Override
 		public void run() {
-			Toast.makeText(ctx, message, length).show();
+			Toast.makeText(ctx.getContext(), message, length).show();
 		}
 
 	}

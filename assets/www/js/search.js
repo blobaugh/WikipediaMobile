@@ -1,116 +1,126 @@
 window.search = function() {
+	var curReq = null; // Current search request
+
+	function stopCurrentRequest() {
+		if(curReq !== null) {
+			curReq.abort();
+			curReq = null;
+		}
+	}
+
+	function handleNetworkFailure(err, xhr) {
+		// We abort previous requests before making a new one
+		// So we don't need to be showing error messages when the error is an abort
+		if(err.statusText !== "abort") {
+			chrome.popupErrorMessage(xhr);
+			chrome.hideSpinner();
+		}
+	}
+
 	function performSearch(term, isSuggestion) {
-		if($('#search').hasClass('inProgress')) {
-			network.stopCurrentRequest();
-			$('#search').removeClass('inProgress');
+		if(term == '') {
+			chrome.showContent();
 			return;
 		}
-		if (network.isConnected()) {
-			if (term == '') {
-				chrome.showContent();
-				return;
-			}
+		chrome.showSpinner();
 
-			chrome.showSpinner();
-			$('#search').addClass('inProgress');
-
-			if(!isSuggestion) {
-				var url = app.urlForTitle(term);
-				app.navigateToPage(url);
-				return;
-			}
-			getSearchResults( term );
+		if(!isSuggestion) {
+			return getFullTextSearchResults(term);
 		} else {
-			chrome.showNoConnectionMessage();
-			chrome.showContent();
+			return getSearchResults(term);
 		}
 	}
 
 	function getDidYouMeanResults(results) {
 		// perform did you mean search
-		console.log( "Performing 'did you mean' search for", results[0] );
-		var requestUrl = app.baseURL + "/w/api.php";        
-		$.ajax({
-   			type: 'GET',
-			url: requestUrl,
-			data: {
-				action: 'query',
-       			list: 'search',                
-				srsearch: results[0],
-       			srinfo: 'suggestion',
-				format: 'json'
-       		},
-       		success: function(data) {
-				var suggestion_results = JSON.parse( data );
-				var suggestion = getSuggestionFromSuggestionResults( suggestion_results );
-				if ( suggestion ) {
-					getSearchResults( suggestion, 'true' );
-				}
+		stopCurrentRequest();
+		curReq = app.makeAPIRequest({
+			action: 'query',
+			list: 'search',
+			srsearch: results[0],
+			srinfo: 'suggestion',
+			format: 'json'
+		}).done(function(data) {
+			var suggestion_results = data;
+			var suggestion = getSuggestionFromSuggestionResults(suggestion_results);
+			if(suggestion) {
+				getSearchResults(suggestion, 'true');
 			}
-		});
+		}).fail(handleNetworkFailure);
+		chrome.setSpinningReq(curReq);
 	}
 
-	function getSuggestionFromSuggestionResults( suggestion_results ) {
-		console.log( "Suggestion results", suggestion_results );
-		if ( typeof suggestion_results.query.searchinfo != 'undefined' ) {
+	function getSuggestionFromSuggestionResults(suggestion_results) {
+		if(typeof suggestion_results.query.searchinfo != 'undefined') {
 			var suggestion = suggestion_results.query.searchinfo.suggestion;
-			console.log( 'Suggestion found:', suggestion );
 			return suggestion;
 		} else {
 			return false;
 		}
 	}
-	
-	function getSearchResults(term, didyoumean) {
-		console.log( 'Getting search results for term:', term );
-		var requestUrl = app.baseURL + "/w/api.php";
-		$.ajax({
-			type: 'GET',
-			url: requestUrl,
-			data: {
-				action: 'opensearch',
-				search: term,
-				format: 'json'
-			},
-			success: function(data) {
-				var results = JSON.parse( data );
-				if ( results[1].length === 0 ) { 
-					console.log( "No results for", term );
-					getDidYouMeanResults( results );
-				} else {
-					if ( typeof didyoumean == 'undefined' ) {
-						didyoumean = false;
-					}
-					console.log( 'Did you mean?', didyoumean );
-					renderResults(results, didyoumean);
-				}			
+
+	function getFullTextSearchResults(term) {
+		stopCurrentRequest();
+		curReq = app.makeAPIRequest({
+			action: 'query',
+			list: 'search',
+			srsearch: term,
+			srinfo: '',
+			srprop: ''
+		}).done(function(data) {
+			var searchResults = [];
+			for(var i = 0; i < data.query.search.length; i++) {
+				var result = data.query.search[i];
+				searchResults.push(result.title);
 			}
-		});
+			renderResults([term, searchResults], false);
+		}).fail(handleNetworkFailure);
+		chrome.setSpinningReq(curReq);
+		return curReq;
+	}
+
+	function getSearchResults(term, didyoumean) {
+		stopCurrentRequest();
+		curReq = app.makeAPIRequest({
+			action: 'opensearch',
+			search: term
+		}).done(function(data) {
+			var results = data;
+			if(results[1].length === 0) { 
+				getDidYouMeanResults(results);
+			} else {
+				if(typeof didyoumean == 'undefined') {
+					didyoumean = false;
+				}
+				renderResults(results, didyoumean);
+			}
+		}).fail(handleNetworkFailure);
+		chrome.setSpinningReq(curReq);
+		return curReq;
 	}
 
 	function onSearchResultClicked() {
 		var parent = $(this).parents(".listItemContainer");
-		var url = parent.attr("data-page-url");
+		var url = parent.data("page-url");
+		$("#search").focus(); // Hides the keyboard
 		app.navigateToPage(url);
 	}
 
-	function onCloseSearchResults() {
-		chrome.hideOverlays();
+	function onDoFullSearch() {
+		performSearch($("#searchParam").val(), false);
 	}
 
 	function renderResults(results, didyoumean) {
 		var template = templates.getTemplate('search-results-template');
-		if (results.length > 0) {
-
+		if(results.length > 0) {
 			var searchParam = results[0];
-			console.log( "searchParam", searchParam );
 			var searchResults = results[1].map(function(title) {
 				return {
 					key: app.urlForTitle(title),
 					title: title
 				};
 			});
-			if ( didyoumean ) {
+			if(didyoumean) {
 				var didyoumean_link = {
 					key: app.urlForTitle(results[0]),
 					title: results[0]
@@ -121,31 +131,22 @@ window.search = function() {
 			}
 			$("#resultList .searchItem").click(onSearchResultClicked);
 		}
-		$(".closeSearch").click(onCloseSearchResults);
-		// Replace icon of savd pages in search suggestions
-		var savedPagesDB = new Lawnchair({name:"savedPagesDB"}, function() {
-			$("#resultList .listItemContainer").each(function() {
-				var container = this;
-				var url = $(this).attr('data-page-url');
-				savedPagesDB.exists(url, function(exists) {
-					if(exists) {
-						$(container).find(".iconSearchResult").removeClass("iconSearchResult").addClass("iconSavedPage");
-					}
-				});
-			});
+		$("#doFullSearch").click(onDoFullSearch);
+		$("#resultList .searchItem").bind('touchstart', function() {
+			$("#searchParam").blur();
 		});
-
-		$('#search').removeClass('inProgress');
 		chrome.hideSpinner();
 		chrome.hideOverlays();
-
+		$('#searchresults').localize().show();
 		if(!chrome.isTwoColumnView()) {
 			$("#content").hide(); // Not chrome.hideContent() since we want the header
+		} else {
+			$("html").addClass('overlay-open');
 		}
-
-		chrome.doFocusHack();
-		$('#searchresults').localize().show();
-		chrome.doScrollHack('#searchresults .scroller');
+		chrome.setupScrolling('#searchresults .scroller');
+		// see http://forrst.com/posts/iOS_scrolling_issue_solved-rgX
+		// Fix for bug causing page to not scroll in iOS 5.x when visited from nearby
+		chrome.scrollTo("#searchresults .scroller", 0);
 	}
 
 	return {
